@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const authService = require('../services/authService');
+const { COOKIE_SESSION_NAME } = require('../constants');
 
 router.get('/login', (req, res) => {
     res.render('auth/login');
@@ -19,13 +20,27 @@ router.post('/register', async (req, res) => {
     try {
         // Create user
         const createdUser = await authService.create({ username, password, address });
-        res.redirect('/login');
+        const token = authService.createToken(createdUser);
+
+        res.cookie(COOKIE_SESSION_NAME, token);
+        res.redirect('/');
 
     } catch (error) {
         // Add mongoose error mapper
         return res.render('auth/register', { error: 'db error' });
     }
 
+});
+
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await authService.login(username, password);
+    const token = await authService.createToken(user);
+
+    res.cookie(COOKIE_SESSION_NAME, token);
+
+    res.redirect('/');
 });
 
 module.exports = router;
