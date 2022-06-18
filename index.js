@@ -6,7 +6,7 @@ const hbs = require('express-handlebars');
 
 const app = express();
 
-app.engine = ('hbs', hbs.engine({
+app.engine('hbs', hbs.engine({
     extname: 'hbs'
 }));
 
