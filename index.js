@@ -1,6 +1,7 @@
 const express = require('express');
 const { PORT } = require('./config/env');
 const routes = require('./routes');
+const { dbInit } = require('./config/db');
 
 const hbs = require('express-handlebars');
 
@@ -18,5 +19,5 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(routes);
 
-
+dbInit()
 app.listen(PORT, () => console.log(`App is listening on port ${PORT}...`));
