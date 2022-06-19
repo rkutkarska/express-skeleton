@@ -1,17 +1,29 @@
 const router = require('express').Router();
 const authService = require('../services/authService');
 const { COOKIE_SESSION_NAME } = require('../constants');
-const { isAuth } = require('../middlewares/authMiddleware');
+const { isAuth, isGuest } = require('../middlewares/authMiddleware');
+const { getErrorMessage } = require('../utils/errorHelpers');
 
-router.get('/login', (req, res) => {
+router.get('/login', isGuest, (req, res) => {
     res.render('auth/login');
 });
 
-router.get('/register', (req, res) => {
+router.post('/login', isGuest, async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await authService.login(username, password);
+    const token = await authService.createToken(user);
+
+    res.cookie(COOKIE_SESSION_NAME, token, { httpOnly: true });
+
+    res.redirect('/');
+});
+
+router.get('/register', isGuest, (req, res) => {
     res.render('auth/register');
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', isGuest, async (req, res) => {
     const { username, password, repeatPassword, address } = req.body;
 
     if (password !== repeatPassword) {
@@ -27,20 +39,8 @@ router.post('/register', async (req, res) => {
         res.redirect('/');
 
     } catch (error) {
-        // Add mongoose error mapper
-        return res.render('auth/register', { error: 'db error' });
+        return res.render('auth/register', { error: getErrorMessage(error) });
     }
-});
-
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    const user = await authService.login(username, password);
-    const token = await authService.createToken(user);
-
-    res.cookie(COOKIE_SESSION_NAME, token, { httpOnly: true });
-
-    res.redirect('/');
 });
 
 router.get('/logout', isAuth, (req, res) => {

@@ -11,7 +11,9 @@ exports.auth = (req, res, next) => {
         jwt.verify(token, SECRET, ((err, decodedToken) => {
             if (err) {
                 res.clearCookie(COOKIE_SESSION_NAME);
-                return next(err);
+                // return next(err);
+
+                res.redirect('/login');
             }
 
             req.user = decodedToken;
@@ -21,7 +23,7 @@ exports.auth = (req, res, next) => {
     } else {
         next();
     }
-}
+};
 
 exports.isAuth = (req, res, next) => {
     if (!req.user) {
@@ -29,4 +31,12 @@ exports.isAuth = (req, res, next) => {
     }
 
     next();
-}
+};
+
+exports.isGuest = (req, res, next) => {
+    if (req.user) {
+        return res.redirect('/');
+    }
+
+    next();
+};
