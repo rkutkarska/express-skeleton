@@ -4,7 +4,7 @@ const { COOKIE_SESSION_NAME } = require('../constants');
 const { SECRET } = require('../config/env');
 
 
-exports.auth = async (req, res, next) => {
+exports.auth = (req, res, next) => {
     const token = req.cookies[COOKIE_SESSION_NAME];
 
     if (token) {
@@ -15,8 +15,7 @@ exports.auth = async (req, res, next) => {
             }
 
             req.user = decodedToken;
-            res.locals = decodedToken;
-
+            res.locals.user = decodedToken;
             next();
         }));
     } else {

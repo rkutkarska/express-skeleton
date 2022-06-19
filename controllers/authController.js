@@ -29,7 +29,6 @@ router.post('/register', async (req, res) => {
         // Add mongoose error mapper
         return res.render('auth/register', { error: 'db error' });
     }
-
 });
 
 router.post('/login', async (req, res) => {

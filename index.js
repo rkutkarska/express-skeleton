@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const { PORT } = require('./config/env');
 const routes = require('./routes');
 const { dbInit } = require('./config/db');
+const { auth } = require('./middlewares/authMiddleware')
 
 const app = express();
 
@@ -19,7 +20,9 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
 app.use(cookieParser());
+app.use(auth)
 app.use(routes);
 
-dbInit()
+dbInit();
+
 app.listen(PORT, () => console.log(`App is listening on port ${PORT}...`));
